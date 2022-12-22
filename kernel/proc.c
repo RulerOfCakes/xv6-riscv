@@ -622,3 +622,51 @@ void procdump(void) {
     printf("%d\t%d\t%s\t%s\n", p->pid, p->pgid, state, p->name);
   }
 }
+
+// Find a process with matching pid and lock & return
+static struct proc *find_proc_then_lock(int pid) {
+  struct proc *p;
+  if (pid == 0) {
+    p = myproc();
+    acquire(&p->lock);
+    return p;
+  }
+  for (p = proc; p < &proc[NPROC]; p++) {
+    acquire(&p->lock);
+    if (p->pid == pid) {
+      return p;
+    } else {
+      release(&p->lock);
+    }
+  }
+  // process is not found
+  return 0;
+}
+
+int getpgid(int pid) {
+  if (pid < 0)
+    return -1;
+  struct proc *p = find_proc_then_lock(pid);
+  if (p == 0)
+    return -1;
+
+  int pgid = p->pgid;
+  release(&p->lock);
+  return pgid;
+}
+
+int setpgid(int pid, int pgid) {
+  if (pid < 0 || pgid < 0)
+    return -1;
+
+  struct proc *p = find_proc_then_lock(pid);
+  if (p == 0)
+    return -1;
+
+  if (pgid == 0) {
+    pgid = p->pid;
+  }
+  p->pgid = pgid;
+  release(&p->lock);
+  return 0;
+}

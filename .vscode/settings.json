@@ -1,3 +1,8 @@
 {
-    "files.autoSave": "onFocusChange"
+    "files.autoSave": "onFocusChange",
+    "files.associations": {
+        "defs.h": "c",
+        "spinlock.h": "c",
+        "riscv.h": "c"
+    }
 }

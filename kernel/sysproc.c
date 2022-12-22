@@ -41,7 +41,7 @@ uint64 sys_sleep(void) {
   argint(0, &n);
   acquire(&tickslock);
   ticks0 = ticks;
-  while (ticks - ticks0 < n) {
+  while ((int)(ticks - ticks0) < n) {
     if (killed(myproc())) {
       release(&tickslock);
       return -1;
@@ -73,7 +73,8 @@ uint64 sys_uptime(void) {
 uint64 sys_getpgid(void) {
   int pid;
   argint(0, &pid);
-  return myproc()->pgid;
+
+  return getpgid(pid);
 }
 
 uint64 sys_setpgid(void) {
@@ -81,5 +82,5 @@ uint64 sys_setpgid(void) {
   argint(0, &pid);
   argint(1, &pgid);
 
-  return myproc()->pgid;
+  return setpgid(pid, pgid);
 }
